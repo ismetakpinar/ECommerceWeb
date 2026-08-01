@@ -1,0 +1,34 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0" />
+
+    <title>@ViewData["Title"] - ECommerce</title>
+
+    @await Html.PartialAsync("Components/_Styles")
+</head>
+
+<body>
+
+    @await Html.PartialAsync("Components/_TopBar")
+
+    @await Html.PartialAsync("Components/_Header")
+
+    @await Html.PartialAsync("Components/_Navbar")
+
+    <main role="main">
+        @RenderBody()
+    </main>
+
+    @await Html.PartialAsync("Components/_Footer")
+
+    @await Html.PartialAsync("Components/_Scripts")
+
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+
+</html>

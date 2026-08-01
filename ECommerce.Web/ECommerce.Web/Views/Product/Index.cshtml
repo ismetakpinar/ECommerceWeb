@@ -1,0 +1,19 @@
+﻿@model IEnumerable<ECommerce.Web.ViewModels.Product.ProductListViewModel>
+
+@{
+    ViewData["Title"] = "Ana Sayfa";
+}
+
+@await Html.PartialAsync("Components/_Carousel")
+
+@await Html.PartialAsync("Components/_Featured")
+
+@await Html.PartialAsync("Components/_Categories")
+
+@await Html.PartialAsync("Components/_FeaturedProducts")
+
+@await Html.PartialAsync("Components/_Offer")
+
+@await Html.PartialAsync("Components/_RecentProducts")
+
+@await Html.PartialAsync("Components/_Vendor")

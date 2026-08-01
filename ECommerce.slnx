@@ -1,0 +1,10 @@
+<Solution>
+  <Project Path="../ECommerce.Web/ECommerce.Web/ECommerce.Web.csproj" />
+  <Project Path="../ECommerceAPI/ECommerceAPI.Business/ECommerceAPI.Business.csproj" />
+  <Project Path="../ECommerceAPI/ECommerceAPI.DataAccess/ECommerceAPI.DataAccess.csproj" />
+  <Project Path="../ECommerceAPI/ECommerceAPI.Dto/ECommerceAPI.Dto.csproj" />
+  <Project Path="../ECommerceAPI/ECommerceAPI.Entity/ECommerceAPI.Entity.csproj" />
+  <Project Path="../ECommerceAPI/ECommerceAPI.IntegrationTests/ECommerceAPI.IntegrationTests.csproj" />
+  <Project Path="../ECommerceAPI/ECommerceAPI.Tests/ECommerceAPI.Tests.csproj" />
+  <Project Path="../ECommerceAPI/ECommerceAPI/ECommerceAPI.csproj" />
+</Solution>
