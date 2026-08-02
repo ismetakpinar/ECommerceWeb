@@ -24,4 +24,5 @@ public interface IProductService
     Task<ApiResponse<object>?> DeleteAsync(
         int id,
         CancellationToken cancellationToken = default);
+
 }
