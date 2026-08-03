@@ -11,4 +11,8 @@ public sealed class ProductListViewModel
     public int Stock { get; init; }
 
     public string CategoryName { get; init; } = string.Empty;
+
+    public string ImageUrl { get; set; } = string.Empty;
+
+    public bool IsFeatured { get; set; }
 }

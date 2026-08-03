@@ -23,6 +23,15 @@ public static class ServiceCollectionExtensions
 
                 client.BaseAddress = new Uri(settings.BaseUrl);
             });
+        services.AddHttpClient<ICategoryService, CategoryService>(
+            (serviceProvider, client) =>
+    {
+        var settings = serviceProvider
+            .GetRequiredService<IOptions<ApiSettings>>()
+            .Value;
+
+        client.BaseAddress = new Uri(settings.BaseUrl);
+    });
 
         return services;
     }

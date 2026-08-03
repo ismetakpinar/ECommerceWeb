@@ -15,7 +15,6 @@
     <Folder Include="ViewModels\Address\" />
     <Folder Include="ViewModels\Auth\" />
     <Folder Include="ViewModels\Cart\" />
-    <Folder Include="ViewModels\Category\" />
     <Folder Include="ViewModels\Common\" />
     <Folder Include="ViewModels\Customer\" />
     <Folder Include="ViewModels\Order\" />

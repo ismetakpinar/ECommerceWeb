@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ECommerce.Web.ViewModels.Product.ProductListViewModel>
+﻿@model ECommerce.Web.ViewModels.Home.HomeViewModel
 
 @{
     ViewData["Title"] = "Ana Sayfa";
@@ -8,12 +8,18 @@
 
 @await Html.PartialAsync("Components/_Featured")
 
-@await Html.PartialAsync("Components/_Categories")
+@await Html.PartialAsync(
+    "Components/_Categories",
+    Model.Categories)
 
-@await Html.PartialAsync("Components/_FeaturedProducts")
+@await Html.PartialAsync(
+    "Components/_FeaturedProducts",
+    Model.FeaturedProducts)
 
 @await Html.PartialAsync("Components/_Offer")
 
-@await Html.PartialAsync("Components/_RecentProducts")
+@await Html.PartialAsync(
+    "Components/_RecentProducts",
+    Model.RecentProducts)
 
 @await Html.PartialAsync("Components/_Vendor")

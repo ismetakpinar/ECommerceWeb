@@ -2,6 +2,8 @@
 using ECommerce.Web.Models;
 using ECommerce.Web.Services.Abstract;
 using ECommerce.Web.ViewModels.Product;
+using ECommerceAPI.Entity.Enums;
+
 
 namespace ECommerce.Web.Services.Concrete;
 
@@ -13,16 +15,39 @@ public sealed class ProductService
     {
     }
 
-    // ...
-
 
     public async Task<ApiResponse<PagedResult<ProductListViewModel>>?> GetAllAsync(
+    ProductQueryViewModel request,
     CancellationToken cancellationToken = default)
     {
+        var query = new List<string>
+    {
+        $"page={request.Page}",
+        $"pageSize={request.PageSize}"
+    };
+
+        if (request.CategoryId.HasValue)
+            query.Add($"categoryId={request.CategoryId.Value}");
+
+        if (request.IsFeatured.HasValue)
+            query.Add($"isFeatured={request.IsFeatured.Value.ToString().ToLower()}");
+
+        if (!string.IsNullOrWhiteSpace(request.Search))
+            query.Add($"search={Uri.EscapeDataString(request.Search)}");
+
+        if (request.SortBy != ProductSortBy.None)
+            query.Add($"sortBy={(int)request.SortBy}");
+
+        var endpoint =
+            $"{ApiEndpoints.Products}?{string.Join("&", query)}";
+
         return await GetAsync<PagedResult<ProductListViewModel>>(
-            ApiEndpoints.Products,
+            endpoint,
             cancellationToken);
+
     }
+
+
 
     public Task<ApiResponse<ProductDetailViewModel>?> GetByIdAsync(
         int id,
@@ -52,5 +77,6 @@ public sealed class ProductService
     {
         throw new NotImplementedException();
     }
+
 
 }

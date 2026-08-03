@@ -6,7 +6,8 @@ namespace ECommerce.Web.Services.Abstract;
 public interface IProductService
 {
     Task<ApiResponse<PagedResult<ProductListViewModel>>?> GetAllAsync(
-        CancellationToken cancellationToken = default);
+    ProductQueryViewModel request,
+    CancellationToken cancellationToken = default);
 
     Task<ApiResponse<ProductDetailViewModel>?> GetByIdAsync(
         int id,
