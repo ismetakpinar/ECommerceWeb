@@ -1,0 +1,127 @@
+﻿@model List<ECommerce.Web.ViewModels.Order.OrderListViewModel>
+
+@{
+    ViewData["Title"] = "Siparişlerim";
+}
+
+<div class="container mt-5">
+
+    <h2 class="mb-4">
+        Siparişlerim
+    </h2>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+
+            Henüz siparişiniz bulunmamaktadır.
+
+        </div>
+    }
+    else
+    {
+        <table class="table table-bordered table-hover">
+
+            <thead class="table-dark">
+
+                <tr>
+
+                    <th>Sipariş No</th>
+
+                    <th>Tarih</th>
+
+                    <th>Durum</th>
+
+                    <th>Toplam</th>
+
+                    <th></th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+            @foreach (var order in Model)
+            {
+                <tr>
+
+                    <td>
+
+                        #@order.OrderId
+
+                    </td>
+
+                    <td>
+
+                        @order.OrderDate.ToString("dd.MM.yyyy HH:mm")
+
+                    </td>
+
+                    <td>
+
+                            @switch (order.Status)
+                            {
+                                case 1:
+                                    <span class="badge bg-warning text-dark">
+                                        Bekliyor
+                                    </span>
+                                    break;
+
+                                case 2:
+                                    <span class="badge bg-primary">
+                                        Hazırlanıyor
+                                    </span>
+                                    break;
+
+                                case 3:
+                                    <span class="badge bg-info text-dark">
+                                        Kargoda
+                                    </span>
+                                    break;
+
+                                case 4:
+                                    <span class="badge bg-success">
+                                        Teslim Edildi
+                                    </span>
+                                    break;
+
+                                case 5:
+                                    <span class="badge bg-danger">
+                                        İptal Edildi
+                                    </span>
+                                    break;
+
+                                default:
+                                    <span class="badge bg-secondary">
+                                        Bilinmiyor
+                                    </span>
+                                    break;
+                            }
+
+                    </td>
+
+                        <td>@order.TotalAmount.ToString("N2") ₺</td>
+
+                    <td>
+
+                        <a asp-controller="Order"
+                           asp-action="Detail"
+                           asp-route-id="@order.OrderId"
+                           class="btn btn-primary btn-sm">
+
+                            Detay
+
+                        </a>
+
+                    </td>
+
+                </tr>
+            }
+
+            </tbody>
+
+        </table>
+    }
+
+</div>

@@ -1,0 +1,95 @@
+@model ECommerce.Web.Models.PagedResult<ECommerce.Web.ViewModels.Product.ProductListViewModel>
+
+@{
+    ViewData["Title"] = "Ürünler";
+}
+
+<div class="container-fluid pt-5 pb-3">
+    <h2 class="section-title position-relative text-uppercase mx-xl-5 mb-4">
+        <span class="bg-secondary pr-3">Ürünler</span>
+    </h2>
+
+    <form asp-controller="Product" asp-action="Index" method="get" class="row px-xl-5 mb-4">
+        <input type="hidden" name="categoryId" value="@ViewBag.CategoryId" />
+        <div class="col-md-6 col-lg-4">
+            <label class="sr-only" for="product-search">Ürün ara</label>
+            <div class="input-group">
+                <input id="product-search" name="search" value="@ViewBag.Search" class="form-control" placeholder="Ürün ara" />
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="submit" aria-label="Ara">
+                        <i class="fa fa-search"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="row px-xl-5">
+        @if (!Model.Items.Any())
+        {
+            <div class="col-12 text-center">
+                <h5>@(string.IsNullOrWhiteSpace(ViewBag.Search as string) ? "Bu kategoride ürün bulunamadı." : "Aramanızla eşleşen ürün bulunamadı.")</h5>
+            </div>
+        }
+        else
+        {
+            @foreach (var product in Model.Items)
+            {
+                <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
+                    <div class="product-item bg-light mb-4">
+                        <div class="product-img position-relative overflow-hidden">
+                            <img class="img-fluid w-100"
+                                 src="@(string.IsNullOrWhiteSpace(product.ImageUrl) ? Url.Content("~/theme/img/product-1.jpg") : product.ImageUrl)"
+                                 alt="@product.Name" />
+                            <div class="product-action">
+                                <a asp-controller="Product"
+                                   asp-action="Detail"
+                                   asp-route-id="@product.ProductId"
+                                   class="btn btn-outline-dark btn-square">
+                                    <i class="fa fa-search"></i>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="text-center py-4">
+                            <a asp-controller="Product"
+                               asp-action="Detail"
+                               asp-route-id="@product.ProductId"
+                               class="h6 text-decoration-none text-truncate">
+                                @product.Name
+                            </a>
+                            <div class="d-flex align-items-center justify-content-center mt-2">
+                                <h5>@product.Price.ToString("N2") ₺</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+
+    @if (Model.TotalPages > 1)
+    {
+        <nav aria-label="Ürün sayfaları" class="d-flex justify-content-center mt-4">
+            <ul class="pagination">
+                @if (Model.Page > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Index" asp-route-categoryId="@ViewBag.CategoryId" asp-route-search="@ViewBag.Search" asp-route-page="@(Model.Page - 1)" aria-label="Önceki sayfa">&laquo;</a>
+                    </li>
+                }
+                @for (var pageNumber = 1; pageNumber <= Model.TotalPages; pageNumber++)
+                {
+                    <li class="page-item @(pageNumber == Model.Page ? "active" : "")">
+                        <a class="page-link" asp-action="Index" asp-route-categoryId="@ViewBag.CategoryId" asp-route-search="@ViewBag.Search" asp-route-page="@pageNumber">@pageNumber</a>
+                    </li>
+                }
+                @if (Model.Page < Model.TotalPages)
+                {
+                    <li class="page-item">
+                        <a class="page-link" asp-action="Index" asp-route-categoryId="@ViewBag.CategoryId" asp-route-search="@ViewBag.Search" asp-route-page="@(Model.Page + 1)" aria-label="Sonraki sayfa">&raquo;</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    }
+</div>

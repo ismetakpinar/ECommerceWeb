@@ -10,8 +10,8 @@ public interface IProductService
     CancellationToken cancellationToken = default);
 
     Task<ApiResponse<ProductDetailViewModel>?> GetByIdAsync(
-        int id,
-        CancellationToken cancellationToken = default);
+    int productId,
+    CancellationToken cancellationToken = default);
 
     Task<ApiResponse<ProductDetailViewModel>?> CreateAsync(
         CreateProductViewModel request,

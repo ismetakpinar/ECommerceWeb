@@ -1,0 +1,402 @@
+﻿@model ECommerce.Web.ViewModels.Order.OrderDetailViewModel
+
+@{
+    ViewData["Title"] = "Sipariş Detayı";
+}
+
+<div class="container-fluid pt-5">
+
+    <div class="container">
+
+        <!-- Breadcrumb -->
+
+        <nav aria-label="breadcrumb" class="mb-4">
+
+            <ol class="breadcrumb bg-light px-3 py-2">
+
+                <li class="breadcrumb-item">
+
+                    <a asp-controller="Home"
+                       asp-action="Index">
+
+                        Ana Sayfa
+
+                    </a>
+
+                </li>
+
+                <li class="breadcrumb-item">
+
+                    <a asp-controller="Order"
+                       asp-action="Index">
+
+                        Siparişlerim
+
+                    </a>
+
+                </li>
+
+                <li class="breadcrumb-item active">
+
+                    Sipariş Detayı
+
+                </li>
+
+            </ol>
+
+        </nav>
+
+        <h2 class="mb-4">
+
+            Sipariş Detayı
+
+        </h2>
+
+        <!-- Sipariş Bilgileri -->
+
+        <div class="card shadow-sm mb-4">
+
+            <div class="card-header bg-dark text-white">
+
+                Sipariş Bilgileri
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="row">
+
+                    <div class="col-md-6">
+
+                        <p>
+
+                            <strong>Sipariş No</strong><br />
+
+                            SIP-@Model.OrderId.ToString("D6")
+
+                        </p>
+
+                        <p>
+
+                            <strong>Tarih</strong><br />
+
+                            @Model.OrderDate.ToString("dd.MM.yyyy HH:mm")
+
+                        </p>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <p>
+
+                            <strong>Müşteri</strong><br />
+
+                            👤 @Model.CustomerName
+
+                        </p>
+
+                        <p>
+
+                            <strong>Durum</strong><br />
+
+                            @if (Model.Status == 1)
+                            {
+                                <span class="badge badge-warning px-3 py-2">
+                                    Bekliyor
+                                </span>
+                            }
+                            else if (Model.Status == 2)
+                            {
+                                <span class="badge badge-primary px-3 py-2">
+                                    Hazırlanıyor
+                                </span>
+                            }
+                            else if (Model.Status == 3)
+                            {
+                                <span class="badge badge-info px-3 py-2">
+                                    Kargoda
+                                </span>
+                            }
+                            else if (Model.Status == 4)
+                            {
+                                <span class="badge badge-success px-3 py-2">
+                                    Teslim Edildi
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-danger px-3 py-2">
+                                    İptal Edildi
+                                </span>
+                            }
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Teslimat Bilgileri -->
+
+        <div class="card shadow-sm mb-4">
+
+            <div class="card-header bg-dark text-white">
+
+                Teslimat Bilgileri
+
+            </div>
+
+            <div class="card-body">
+
+                <div class="row">
+
+                    <div class="col-md-6">
+
+                        <p>
+
+                            <strong>Adres Başlığı</strong><br />
+
+                            @Model.ShippingAddressTitle
+
+                        </p>
+
+                        <p>
+
+                            <strong>Şehir</strong><br />
+
+                            📍 @Model.ShippingCity
+
+                        </p>
+
+                    </div>
+
+                    <div class="col-md-6">
+
+                        <p>
+
+                            <strong>İlçe</strong><br />
+
+                            @Model.ShippingDistrict
+
+                        </p>
+
+                        <p>
+
+                            <strong>Adres</strong><br />
+
+                            @Model.ShippingFullAddress
+
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Sipariş Ürünleri -->
+        <div class="card shadow-sm mb-4">
+
+            <div class="card-header bg-dark text-white">
+
+                Sipariş Ürünleri
+
+            </div>
+
+            <div class="table-responsive">
+
+                <table class="table table-hover table-bordered mb-0">
+
+                    <thead class="thead-light">
+
+                        <tr>
+
+                            <th>Ürün</th>
+
+                            <th class="text-center">Birim Fiyat</th>
+
+                            <th class="text-center">Adet</th>
+
+                            <th class="text-right">Toplam</th>
+
+                            <th class="text-center">Durum</th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr>
+
+                                <td class="align-middle">
+
+                                    <a asp-controller="Product"
+                                       asp-action="Detail"
+                                       asp-route-id="@item.ProductId"
+                                       class="text-dark font-weight-bold">
+
+                                        @item.ProductName
+
+                                    </a>
+
+                                </td>
+
+                                <td class="text-center align-middle">
+
+                                    @item.UnitPrice.ToString("N2") ₺
+
+                                </td>
+
+                                <td class="text-center align-middle">
+
+                                    @item.Quantity
+
+                                </td>
+
+                                <td class="text-right align-middle font-weight-bold">
+
+                                    @item.LineTotal.ToString("N2") ₺
+
+                                </td>
+
+                                <td class="text-center align-middle">
+
+                                    @if (Model.Status == 1)
+                                    {
+                                        <span class="badge badge-warning px-3 py-2">
+                                            Bekliyor
+                                        </span>
+                                    }
+                                    else if (Model.Status == 2)
+                                    {
+                                        <span class="badge badge-primary px-3 py-2">
+                                            Hazırlanıyor
+                                        </span>
+                                    }
+                                    else if (Model.Status == 3)
+                                    {
+                                        <span class="badge badge-info px-3 py-2">
+                                            Kargoda
+                                        </span>
+                                    }
+                                    else if (Model.Status == 4)
+                                    {
+                                        <span class="badge badge-success px-3 py-2">
+                                            Teslim Edildi
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-danger px-3 py-2">
+                                            İptal Edildi
+                                        </span>
+                                    }
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+        <!-- Sipariş Özeti -->
+
+        <div class="row mt-4">
+
+            <div class="col-lg-5 ml-auto">
+
+                <div class="card shadow-sm">
+
+                    <div class="card-header bg-dark text-white">
+
+                        Sipariş Özeti
+
+                    </div>
+
+                    <div class="card-body">
+
+                        <div class="d-flex justify-content-between mb-3">
+
+                            <span>Ara Toplam</span>
+
+                            <strong>
+
+                                @Model.TotalAmount.ToString("N2") ₺
+
+                            </strong>
+
+                        </div>
+
+                        <div class="d-flex justify-content-between mb-3">
+
+                            <span>Kargo</span>
+
+                            <span class="text-success font-weight-bold">
+
+                                Ücretsiz
+
+                            </span>
+
+                        </div>
+
+                        <hr />
+
+                        <div class="d-flex justify-content-between align-items-center">
+
+                            <h5 class="mb-0">
+
+                                Genel Toplam
+
+                            </h5>
+
+                            <h4 class="text-warning font-weight-bold mb-0">
+
+                                @Model.TotalAmount.ToString("N2") ₺
+
+                            </h4>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Butonlar -->
+
+        <div class="mt-4 d-flex justify-content-between">
+
+            <a asp-controller="Order"
+               asp-action="Index"
+               class="btn btn-outline-dark">
+
+                <i class="fa fa-arrow-left mr-2"></i>
+
+                Siparişlerime Dön
+
+            </a>
+
+        </div>
+
+    </div>
+
+</div>

@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ECommerce Store</title>
+  <style>
+    :root { color-scheme: light dark; --bg:#0f172a; --card:#111827; --muted:#94a3b8; --text:#f8fafc; --accent:#22c55e; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family:Segoe UI, Arial, sans-serif; background:linear-gradient(135deg,#020617,#111827); color:var(--text); }
+    header { background:rgba(15,23,42,.95); padding:18px 24px; position:sticky; top:0; backdrop-filter:blur(8px); }
+    .wrap { max-width:1200px; margin:0 auto; }
+    nav { display:flex; justify-content:space-between; align-items:center; gap:12px; }
+    .brand { font-size:1.25rem; font-weight:700; }
+    .actions button, .actions input { padding:10px 12px; border-radius:8px; border:1px solid #334155; background:#0f172a; color:white; }
+    .actions { display:flex; gap:10px; align-items:center; }
+    .toolbar { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px; }
+    .toolbar input, .toolbar select { flex:1; min-width:180px; }
+    main { padding:24px; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px; }
+    .card { background:var(--card); border:1px solid #1f2937; border-radius:16px; padding:16px; box-shadow:0 12px 30px rgba(0,0,0,.25); }
+    .card img { width:100%; height:180px; object-fit:cover; border-radius:12px; margin-bottom:10px; background:#374151; }
+    .muted { color:var(--muted); }
+    .pill { display:inline-block; padding:6px 10px; border-radius:999px; background:#1f2937; font-size:.8rem; margin-bottom:8px; }
+    .btn { display:inline-block; padding:10px 12px; border:none; border-radius:8px; cursor:pointer; margin-top:8px; background:var(--accent); color:#052e16; font-weight:700; }
+    .btn.secondary { background:#2563eb; color:white; }
+    .auth, .cart { display:grid; gap:12px; margin-top:16px; }
+    input, textarea { width:100%; padding:10px; border-radius:8px; border:1px solid #334155; background:#020617; color:white; }
+    .status { margin-top:12px; padding:10px; border-radius:8px; background:#111827; }
+    .hidden { display:none; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <nav>
+        <div class="brand">🛒 ECommerce Store</div>
+        <div class="actions">
+          <button id="loginToggle">Giriş</button>
+          <button id="cartToggle">Sepet</button>
+        </div>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="card">
+      <h2>Ürünler</h2>
+      <div class="toolbar">
+        <input id="searchInput" placeholder="Ürün ara..." />
+        <select id="categoryFilter">
+          <option value="">Tüm kategoriler</option>
+        </select>
+        <button class="btn secondary" onclick="loadProducts()">Filtrele</button>
+      </div>
+      <div id="products" class="grid"></div>
+    </section>
+
+    <section class="card auth">
+      <h3>Kayıt / Giriş</h3>
+      <div id="authForm">
+        <input id="email" placeholder="E-posta" />
+        <input id="password" type="password" placeholder="Şifre" />
+        <input id="firstName" placeholder="Ad" />
+        <input id="lastName" placeholder="Soyad" />
+        <input id="phone" placeholder="Telefon" />
+        <button class="btn" onclick="registerOrLogin()">Kayıt / Giriş</button>
+      </div>
+      <div id="authStatus" class="status"></div>
+    </section>
+
+    <section class="card cart">
+      <h3>Sepet</h3>
+      <div id="cartItems"></div>
+      <button class="btn secondary" onclick="checkout()">Sipariş Ver</button>
+    </section>
+
+    <section class="card">
+      <h3>Ürün Detayı</h3>
+      <div id="productDetail" class="status">Seçili ürünün bilgisi burada görünür.</div>
+    </section>
+  </main>
+
+  <script>
+    const apiBase = '/api/v1.0';
+    let token = localStorage.getItem('token') || '';
+    let categories = [];
+
+    async function request(path, options = {}) {
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers.Authorization = `Bearer ${token}`;
+      const res = await fetch(apiBase + path, { ...options, headers });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.message || 'İstek başarısız oldu.');
+      return data;
+    }
+
+    async function loadCategories() {
+      try {
+        const res = await request('/Categories');
+        categories = res.data || [];
+        const select = document.getElementById('categoryFilter');
+        select.innerHTML = '<option value="">Tüm kategoriler</option>' + categories.map(c => `<option value="${c.categoryId}">${c.name}</option>`).join('');
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    async function loadProducts() {
+      const search = document.getElementById('searchInput').value;
+      const categoryId = document.getElementById('categoryFilter').value;
+      const query = new URLSearchParams({ page: '1', pageSize: '10' });
+      if (search) query.set('search', search);
+      if (categoryId) query.set('categoryId', categoryId);
+      const res = await request(`/Products?${query.toString()}`);
+      const items = res.data?.items || [];
+      const container = document.getElementById('products');
+      container.innerHTML = items.map(p => `
+        <article class="card">
+          <img src="${p.imageUrl || 'https://via.placeholder.com/300x180?text=Product'}" alt="${p.name}" />
+          <div class="pill">${p.categoryName || 'Kategori'}</div>
+          <h4>${p.name}</h4>
+          <p class="muted">${p.isFeatured ? 'Öne çıkan ürün' : 'Standart ürün'}</p>
+          <p><strong>${p.price.toLocaleString('tr-TR')} ₺</strong></p>
+          <button class="btn" onclick="showProductDetail(${p.productId})">Detay</button>
+          <button class="btn secondary" onclick="addToCart(${p.productId})">Sepete Ekle</button>
+        </article>
+      `).join('');
+    }
+
+    async function showProductDetail(productId) {
+      try {
+        const res = await request(`/Products/${productId}`);
+        const p = res.data;
+        document.getElementById('productDetail').innerHTML = `
+          <strong>${p.name}</strong><br/>
+          ${p.description || 'Açıklama yok'}<br/>
+          Fiyat: ${p.price.toLocaleString('tr-TR')} ₺<br/>
+          Stok: ${p.stock}<br/>
+          Kategori: ${p.categoryName}
+        `;
+      } catch (err) {
+        document.getElementById('productDetail').textContent = err.message;
+      }
+    }
+
+    async function registerOrLogin() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const firstName = document.getElementById('firstName').value;
+      const lastName = document.getElementById('lastName').value;
+      const phone = document.getElementById('phone').value;
+
+      try {
+        const registerRes = await request('/Auth/register', { method: 'POST', body: JSON.stringify({ firstName, lastName, email, password, phone }) });
+        showStatus(registerRes.message || 'Kayıt başarılı.');
+        const loginRes = await request('/Auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
+        token = loginRes.data?.accessToken || '';
+        localStorage.setItem('token', token);
+        showStatus('Giriş başarılı.');
+      } catch (err) {
+        showStatus(err.message);
+      }
+    }
+
+    async function addToCart(productId) {
+      try {
+        await request('/Cart/add', { method: 'POST', body: JSON.stringify({ productId, quantity: 1 }) });
+        await loadCart();
+        showStatus('Ürün sepete eklendi.');
+      } catch (err) {
+        showStatus(err.message);
+      }
+    }
+
+    async function updateCartItem(productId, quantity) {
+      try {
+        await request('/Cart/update', { method: 'PUT', body: JSON.stringify({ productId, quantity }) });
+        await loadCart();
+      } catch (err) {
+        showStatus(err.message);
+      }
+    }
+
+    async function loadCart() {
+      if (!token) {
+        document.getElementById('cartItems').innerHTML = '<p>Sepeti görmek için giriş yapın.</p>';
+        return;
+      }
+      try {
+        const res = await request('/Cart');
+        const items = res.data?.items || [];
+        document.getElementById('cartItems').innerHTML = items.length ? items.map(i => `
+          <div class="card" style="margin-top:8px; padding:10px;">
+            <strong>${i.productName || 'Ürün'}</strong><br/>
+            Adet: <input type="number" min="1" value="${i.quantity}" onchange="updateCartItem(${i.productId}, Number(this.value))" style="width:70px; display:inline-block; margin-left:8px;" />
+            <div>Toplam: ${i.lineTotal.toLocaleString('tr-TR')} ₺</div>
+          </div>
+        `).join('') : '<p>Sepetiniz boş.</p>';
+      } catch (err) {
+        document.getElementById('cartItems').innerHTML = '<p>Sepet yüklenemedi.</p>';
+      }
+    }
+
+    async function checkout() {
+      try {
+        await request('/Cart/checkout', { method: 'POST', body: JSON.stringify({ addressId: 1, note: 'Teslimat' }) });
+        showStatus('Sipariş oluşturuldu.');
+        await loadCart();
+      } catch (err) {
+        showStatus(err.message);
+      }
+    }
+
+    function showStatus(message) {
+      document.getElementById('authStatus').textContent = message;
+    }
+
+    document.getElementById('loginToggle').addEventListener('click', async () => {
+      if (!token) {
+        await registerOrLogin();
+      } else {
+        showStatus('Zaten giriş yaptınız.');
+      }
+    });
+
+    document.getElementById('cartToggle').addEventListener('click', loadCart);
+    loadCategories();
+    loadProducts();
+    loadCart();
+  </script>
+
+    async function request(path, options = {}) {
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers.Authorization = `Bearer ${token}`;
+      const res = await fetch(apiBase + path, { ...options, headers });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.message || 'İstek başarısız oldu.');
+      return data;
+    }
+
+    async function loadProducts() {
+      const res = await request('/Products?page=1&pageSize=10');
+      const items = res.data?.items || [];
+      const container = document.getElementById('products');
+      container.innerHTML = items.map(p => `
+        <article class="card">
+          <img src="${p.imageUrl || 'https://via.placeholder.com/300x180?text=Product'}" alt="${p.name}" />
+          <div class="pill">${p.categoryName || 'Kategori'}</div>
+          <h4>${p.name}</h4>
+          <p class="muted">${p.isFeatured ? 'Öne çıkan ürün' : 'Standart ürün'}</p>
+          <p><strong>${p.price.toLocaleString('tr-TR')} ₺</strong></p>
+          <button class="btn" onclick="addToCart(${p.productId})">Sepete Ekle</button>
+        </article>
+      `).join('');
+    }
+
+    async function registerOrLogin() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const firstName = document.getElementById('firstName').value;
+      const lastName = document.getElementById('lastName').value;
+      const phone = document.getElementById('phone').value;
+
+      try {
+        const registerRes = await request('/Auth/register', { method: 'POST', body: JSON.stringify({ firstName, lastName, email, password, phone }) });
+        showStatus(registerRes.message || 'Kayıt başarılı.');
+        const loginRes = await request('/Auth/login', { method: 'POST', body: JSON.stringify({ email, password }) });
+        token = loginRes.data?.accessToken || '';
+        localStorage.setItem('token', token);
+        showStatus('Giriş başarılı.');
+      } catch (err) {
+        showStatus(err.message);
+      }
+    }
+
+    async function addToCart(productId) {
+      try {
+        await request('/Cart/add', { method: 'POST', body: JSON.stringify({ productId, quantity: 1 }) });
+        await loadCart();
+        showStatus('Ürün sepete eklendi.');
+      } catch (err) {
+        showStatus(err.message);
+      }
+    }
+
+    async function loadCart() {
+      if (!token) {
+        document.getElementById('cartItems').innerHTML = '<p>Sepeti görmek için giriş yapın.</p>';
+        return;
+      }
+      try {
+        const res = await request('/Cart');
+        const items = res.data?.items || [];
+        document.getElementById('cartItems').innerHTML = items.length ? items.map(i => `<div>${i.productName || 'Ürün'} × ${i.quantity}</div>`).join('') : '<p>Sepetiniz boş.</p>';
+      } catch (err) {
+        document.getElementById('cartItems').innerHTML = '<p>Sepet yüklenemedi.</p>';
+      }
+    }
+
+    async function checkout() {
+      try {
+        await request('/Cart/checkout', { method: 'POST', body: JSON.stringify({ addressId: 1, note: 'Teslimat' }) });
+        showStatus('Sipariş oluşturuldu.');
+        await loadCart();
+      } catch (err) {
+        showStatus(err.message);
+      }
+    }
+
+    function showStatus(message) {
+      document.getElementById('authStatus').textContent = message;
+    }
+
+    document.getElementById('loginToggle').addEventListener('click', async () => {
+      if (!token) {
+        await registerOrLogin();
+      } else {
+        showStatus('Zaten giriş yaptınız.');
+      }
+    });
+
+    document.getElementById('cartToggle').addEventListener('click', loadCart);
+    loadProducts();
+    loadCart();
+  </script>
+</body>
+</html>

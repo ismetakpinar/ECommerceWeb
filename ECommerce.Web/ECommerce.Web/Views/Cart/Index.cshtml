@@ -1,0 +1,385 @@
+﻿@model ECommerce.Web.ViewModels.Cart.CartViewModel
+
+@{
+    ViewData["Title"] = "Sepetim";
+}
+
+<div class="container-fluid py-5">
+
+    <div class="container">
+
+        <div class="mb-4">
+
+            <h2 class="font-weight-bold">
+                Sepetim
+            </h2>
+
+            <p class="text-muted mb-0">
+                Sepetinizdeki ürünleri kontrol ederek siparişinizi tamamlayabilirsiniz.
+            </p>
+
+        </div>
+
+        @if (Model.Items == null || !Model.Items.Any())
+        {
+            <div class="row">
+
+                <div class="col-12">
+
+                    <div class="card shadow-sm">
+
+                        <div class="card-body text-center py-5">
+
+                            <i class="fa fa-shopping-cart fa-3x text-muted mb-4"></i>
+
+                            <h4 class="mb-3">
+                                Sepetiniz boş.
+                            </h4>
+
+                            <p class="text-muted mb-4">
+                                Sipariş vermek için mağazamızdaki ürünlere göz atabilirsiniz.
+                            </p>
+
+                            <a asp-controller="Product"
+                               asp-action="Index"
+                               class="btn btn-warning px-4">
+
+                                Alışverişe Başla
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        }
+        else
+        {
+            <div class="row">
+
+                <!-- ========================= -->
+                <!-- SEPET ÜRÜNLERİ -->
+                <!-- ========================= -->
+
+                <div class="col-lg-8 mb-4">
+
+                    <div class="card shadow-sm">
+
+                        <div class="card-header bg-dark text-white">
+
+                            <div class="d-flex justify-content-between align-items-center">
+
+                                <span>
+
+                                    <i class="fa fa-shopping-cart mr-2"></i>
+
+                                    Sepet Ürünleri
+
+                                </span>
+
+                                <span>
+
+                                    @Model.Items.Sum(x => x.Quantity) ürün
+
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <div class="table-responsive">
+
+                            <table class="table table-hover table-bordered mb-0">
+
+                                <thead class="thead-light">
+
+                                    <tr>
+
+                                        <th>
+                                            Ürün
+                                        </th>
+
+                                        <th class="text-center">
+                                            Fiyat
+                                        </th>
+
+                                        <th class="text-center">
+                                            Adet
+                                        </th>
+
+                                        <th class="text-center">
+                                            Toplam
+                                        </th>
+
+                                        <th class="text-center">
+                                        </th>
+
+                                    </tr>
+
+                                </thead>
+
+                                <tbody>
+
+                                    @foreach (var item in Model.Items)
+                                    {
+                                        <tr>
+
+                                            <!-- ÜRÜN -->
+
+                                            <td class="align-middle">
+
+                                                <a asp-controller="Product"
+                                                   asp-action="Detail"
+                                                   asp-route-id="@item.ProductId"
+                                                   class="font-weight-bold">
+
+                                                    @item.ProductName
+
+                                                </a>
+
+                                            </td>
+
+                                            <!-- BİRİM FİYAT -->
+
+                                            <td class="text-center align-middle">
+
+                                                @item.UnitPrice.ToString("N2") ₺
+
+                                            </td>
+
+                                            <!-- ADET -->
+
+                                            <td class="text-center align-middle">
+
+                                                <div class="d-flex justify-content-center align-items-center">
+
+                                                    <!-- AZALT -->
+
+                                                    <form asp-controller="Cart"
+                                                          asp-action="UpdateQuantity"
+                                                          method="post"
+                                                          class="mr-1">
+
+                                                        @Html.AntiForgeryToken()
+
+                                                        <input type="hidden"
+                                                               name="productId"
+                                                               value="@item.ProductId" />
+
+                                                        <input type="hidden"
+                                                               name="quantity"
+                                                               value="@(item.Quantity - 1)" />
+
+                                                        <button type="submit"
+                                                                class="btn btn-outline-secondary btn-sm"
+                                                            @(item.Quantity <= 1 ? "disabled" : "")>
+
+                                                            <i class="fa fa-minus"></i>
+
+                                                        </button>
+
+                                                    </form>
+
+                                                    <!-- MİKTAR -->
+
+                                                    <span class="border px-3 py-1 mx-1">
+
+                                                        @item.Quantity
+
+                                                    </span>
+
+                                                    <!-- ARTIR -->
+
+                                                    <form asp-controller="Cart"
+                                                          asp-action="UpdateQuantity"
+                                                          method="post"
+                                                          class="ml-1">
+
+                                                        @Html.AntiForgeryToken()
+
+                                                        <input type="hidden"
+                                                               name="productId"
+                                                               value="@item.ProductId" />
+
+                                                        <input type="hidden"
+                                                               name="quantity"
+                                                               value="@(item.Quantity + 1)" />
+
+                                                        <button type="submit"
+                                                                class="btn btn-outline-warning btn-sm">
+
+                                                            <i class="fa fa-plus"></i>
+
+                                                        </button>
+
+                                                    </form>
+
+                                                </div>
+
+                                            </td>
+
+                                            <!-- SATIR TOPLAMI -->
+
+                                            <td class="text-center align-middle font-weight-bold">
+
+                                                @item.TotalAmount.ToString("N2") ₺
+
+                                            </td>
+
+                                            <!-- SİL -->
+
+                                            <td class="text-center align-middle">
+
+                                                <form asp-controller="Cart"
+                                                      asp-action="Remove"
+                                                      method="post">
+
+                                                    @Html.AntiForgeryToken()
+
+                                                    <input type="hidden"
+                                                           name="productId"
+                                                           value="@item.ProductId" />
+
+                                                    <button type="submit"
+                                                            class="btn btn-outline-danger btn-sm"
+                                                            title="Ürünü Sepetten Kaldır">
+
+                                                        <i class="fa fa-times"></i>
+
+                                                    </button>
+
+                                                </form>
+
+                                            </td>
+
+                                        </tr>
+                                    }
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                    <!-- SEPETE DÖN -->
+
+                    <div class="mt-4">
+
+                        <a asp-controller="Product"
+                           asp-action="Index"
+                           class="btn btn-outline-secondary">
+
+                            <i class="fa fa-arrow-left mr-2"></i>
+
+                            Alışverişe Devam Et
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+
+                <!-- ========================= -->
+                <!-- SEPET ÖZETİ -->
+                <!-- ========================= -->
+
+                <div class="col-lg-4">
+
+                    <div class="card shadow-sm sticky-top"
+                         style="top: 20px;">
+
+                        <div class="card-header bg-dark text-white">
+
+                            <i class="fa fa-receipt mr-2"></i>
+
+                            Sepet Özeti
+
+                        </div>
+
+                        <div class="card-body">
+
+                            <!-- ARA TOPLAM -->
+
+                            <div class="d-flex justify-content-between mb-3">
+
+                                <span>
+                                    Ara Toplam
+                                </span>
+
+                                <strong>
+                                    @Model.SubTotal.ToString("N2") ₺
+                                </strong>
+
+                            </div>
+
+                            <!-- KARGO -->
+
+                            <div class="d-flex justify-content-between mb-3">
+
+                                <span>
+                                    Kargo
+                                </span>
+
+                                @if (Model.Shipping == 0)
+                                {
+                                    <strong class="text-success">
+                                        Ücretsiz
+                                    </strong>
+                                }
+                                else
+                                {
+                                    <strong>
+                                        @Model.Shipping.ToString("N2") ₺
+                                    </strong>
+                                }
+
+                            </div>
+
+                            <hr />
+
+                            <!-- GENEL TOPLAM -->
+
+                            <div class="d-flex justify-content-between align-items-center">
+
+                                <h5 class="mb-0">
+                                    Toplam
+                                </h5>
+
+                                <h4 class="mb-0 text-warning font-weight-bold">
+
+                                    @Model.Total.ToString("N2") ₺
+
+                                </h4>
+
+                            </div>
+
+                            <!-- CHECKOUT -->
+
+                            <a asp-controller="Checkout"
+                               asp-action="Index"
+                               class="btn btn-warning btn-lg btn-block font-weight-bold mt-4">
+
+                                <i class="fa fa-check mr-2"></i>
+
+                                Siparişi Tamamla
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+        }
+
+    </div>
+
+</div>

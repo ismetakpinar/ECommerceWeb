@@ -1,0 +1,9 @@
+<Solution>
+  <Project Path="ECommerceAPI.Business/ECommerceAPI.Business.csproj" Id="ba183eaa-ec4e-4cd5-bbad-7fa7e8b7fd12" />
+  <Project Path="ECommerceAPI.DataAccess/ECommerceAPI.DataAccess.csproj" Id="7a255dd2-469e-4662-942d-e4ea9a32226d" />
+  <Project Path="ECommerceAPI.Dto/ECommerceAPI.Dto.csproj" Id="622f4e42-b7e7-49fe-86c7-51bf60fb8e92" />
+  <Project Path="ECommerceAPI.Entity/ECommerceAPI.Entity.csproj" Id="64b783eb-7db6-4f7a-a604-60ee9ea06519" />
+  <Project Path="ECommerceAPI.IntegrationTests/ECommerceAPI.IntegrationTests.csproj" Id="069677ad-1a4d-474e-a76e-db6756cd4164" />
+  <Project Path="ECommerceAPI.Tests/ECommerceAPI.Tests.csproj" Id="b8326afe-ee10-40df-b3ed-f4285a607969" />
+  <Project Path="ECommerceAPI/ECommerceAPI.csproj" />
+</Solution>

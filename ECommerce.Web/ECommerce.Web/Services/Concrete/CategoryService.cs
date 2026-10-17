@@ -1,4 +1,5 @@
-﻿using ECommerce.Web.Infrastructure.Http;
+﻿using ECommerce.Web.Infrastructure.Authentication;
+using ECommerce.Web.Infrastructure.Http;
 using ECommerce.Web.Models;
 using ECommerce.Web.Services.Abstract;
 using ECommerce.Web.ViewModels.Category;
@@ -7,8 +8,10 @@ namespace ECommerce.Web.Services.Concrete;
 
 public sealed class CategoryService : BaseApiService, ICategoryService
 {
-    public CategoryService(HttpClient httpClient)
-        : base(httpClient)
+    public CategoryService(
+    HttpClient httpClient,
+    ITokenService tokenService)
+    : base(httpClient, tokenService)
     {
     }
 
@@ -16,7 +19,7 @@ public sealed class CategoryService : BaseApiService, ICategoryService
         CancellationToken cancellationToken = default)
     {
         return await GetAsync<List<CategoryListViewModel>>(
-            ApiEndpoints.Categories,
+            ApiEndpoints.Category.Base,
             cancellationToken);
     }
 }

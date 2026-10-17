@@ -1,13 +1,17 @@
-﻿<div class="container-fluid">
+﻿@inject ECommerce.Web.Infrastructure.Authentication.ITokenService TokenService
+
+<div class="container-fluid">
     <div class="row bg-secondary py-1 px-xl-5">
 
         <div class="col-lg-6 d-none d-lg-block">
             <div class="d-inline-flex align-items-center h-100">
 
-                <a class="text-body mr-3" href="">About</a>
-                <a class="text-body mr-3" href="">Contact</a>
-                <a class="text-body mr-3" href="">Help</a>
-                <a class="text-body mr-3" href="">FAQs</a>
+                <a class="text-body mr-3" href="/#categories">Kategoriler</a>
+                <a class="text-body mr-3" asp-controller="Product" asp-action="Index">Ürünler</a>
+                @if (!string.IsNullOrWhiteSpace(TokenService.GetAccessToken()))
+                {
+                    <a class="text-body mr-3" asp-controller="Order" asp-action="Index">Siparişlerim</a>
+                }
 
             </div>
         </div>
@@ -20,40 +24,24 @@
                     <button type="button"
                             class="btn btn-sm btn-light dropdown-toggle"
                             data-toggle="dropdown">
-                        My Account
+                        Hesabım
                     </button>
 
                     <div class="dropdown-menu dropdown-menu-right">
-                        <button class="dropdown-item" type="button">Sign in</button>
-                        <button class="dropdown-item" type="button">Sign up</button>
-                    </div>
-                </div>
-
-                <div class="btn-group mx-2">
-                    <button type="button"
-                            class="btn btn-sm btn-light dropdown-toggle"
-                            data-toggle="dropdown">
-                        USD
-                    </button>
-
-                    <div class="dropdown-menu dropdown-menu-right">
-                        <button class="dropdown-item" type="button">EUR</button>
-                        <button class="dropdown-item" type="button">GBP</button>
-                        <button class="dropdown-item" type="button">CAD</button>
-                    </div>
-                </div>
-
-                <div class="btn-group">
-                    <button type="button"
-                            class="btn btn-sm btn-light dropdown-toggle"
-                            data-toggle="dropdown">
-                        EN
-                    </button>
-
-                    <div class="dropdown-menu dropdown-menu-right">
-                        <button class="dropdown-item" type="button">FR</button>
-                        <button class="dropdown-item" type="button">AR</button>
-                        <button class="dropdown-item" type="button">RU</button>
+                        @if (string.IsNullOrWhiteSpace(TokenService.GetAccessToken()))
+                        {
+                            <a class="dropdown-item" asp-controller="Account" asp-action="Login">Giriş Yap</a>
+                            <a class="dropdown-item" asp-controller="Account" asp-action="Register">Kayıt Ol</a>
+                        }
+                        else
+                        {
+                            <a class="dropdown-item" asp-controller="Order" asp-action="Index">Siparişlerim</a>
+                            <form asp-controller="Account" asp-action="Logout" method="post">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="dropdown-item">Çıkış Yap</button>
+                            </form>
+                        }
+                        <a class="dropdown-item" asp-controller="Cart" asp-action="Index">Sepetim</a>
                     </div>
                 </div>
 
@@ -61,16 +49,8 @@
 
             <div class="d-inline-flex align-items-center d-block d-lg-none">
 
-                <a href="" class="btn px-0 ml-2">
-                    <i class="fas fa-heart text-dark"></i>
-                    <span class="badge text-dark border border-dark rounded-circle"
-                          style="padding-bottom:2px;">0</span>
-                </a>
-
-                <a href="" class="btn px-0 ml-2">
-                    <i class="fas fa-shopping-cart text-dark"></i>
-                    <span class="badge text-dark border border-dark rounded-circle"
-                          style="padding-bottom:2px;">0</span>
+                <a asp-controller="Cart" asp-action="Index" class="btn px-0 ml-2">
+                      <i class="fas fa-shopping-cart text-dark" aria-label="Sepetim"></i>
                 </a>
 
             </div>

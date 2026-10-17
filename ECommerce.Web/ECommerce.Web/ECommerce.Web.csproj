@@ -12,12 +12,8 @@
     <Folder Include="Helpers\" />
     <Folder Include="Mapping\" />
     <Folder Include="Middlewares\" />
-    <Folder Include="ViewModels\Address\" />
-    <Folder Include="ViewModels\Auth\" />
-    <Folder Include="ViewModels\Cart\" />
     <Folder Include="ViewModels\Common\" />
     <Folder Include="ViewModels\Customer\" />
-    <Folder Include="ViewModels\Order\" />
     <Folder Include="wwwroot\theme\css\" />
     <Folder Include="wwwroot\theme\js\" />
     <Folder Include="wwwroot\theme\img\" />

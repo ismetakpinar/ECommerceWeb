@@ -1,0 +1,110 @@
+﻿@model ECommerce.Web.ViewModels.Product.ProductDetailViewModel
+
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<div class="container-fluid pb-5">
+
+    <div class="row px-xl-5">
+
+        <!-- Product Image -->
+        <div class="col-lg-5 mb-30">
+
+            <div class="bg-light p-4 text-center border">
+
+                <img class="img-fluid w-100"
+                     src="@(string.IsNullOrWhiteSpace(Model.ImageUrl) ? Url.Content("~/theme/img/product-1.jpg") : Model.ImageUrl)"
+                     alt="@Model.Name">
+
+            </div>
+
+        </div>
+
+        <!-- Product Information -->
+        <div class="col-lg-7 h-auto mb-30">
+
+            <div class="h-100 bg-light p-4">
+
+                <h3>@Model.Name</h3>
+
+                <div class="d-flex mb-3">
+
+                    <small class="fa fa-star text-primary mr-1"></small>
+                    <small class="fa fa-star text-primary mr-1"></small>
+                    <small class="fa fa-star text-primary mr-1"></small>
+                    <small class="fa fa-star text-primary mr-1"></small>
+                    <small class="fa fa-star text-primary mr-1"></small>
+
+                    <small class="pt-1 ml-2">(0 Değerlendirme)</small>
+
+                </div>
+
+                <h3 class="font-weight-semi-bold mb-4">
+                    @Model.Price.ToString("N2") ₺
+                </h3>
+
+                <p class="mb-4">
+
+                    @Model.Description
+
+                </p>
+
+                <div class="mb-3">
+
+                    <strong>Kategori :</strong>
+
+                    <span class="badge badge-info ml-2">
+
+                        @Model.CategoryName
+
+                    </span>
+
+                </div>
+
+                <div class="mb-4">
+
+                    <strong>Stok :</strong>
+
+                    @if (Model.Stock > 0)
+                    {
+                        <span class="badge badge-success ml-2">
+                            Stokta (@Model.Stock)
+                        </span>
+                    }
+                    else
+                    {
+                        <span class="badge badge-danger ml-2">
+                            Tükendi
+                        </span>
+                    }
+
+                </div>
+
+                <form asp-controller="Product"
+                      asp-action="AddToCart"
+                      method="post">
+
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden"
+                           name="productId"
+                           value="@Model.ProductId" />
+
+                    <button type="submit"
+                            class="btn btn-primary px-3 mr-2">
+
+                        <i class="fa fa-shopping-cart mr-1"></i>
+
+                        Sepete Ekle
+
+                    </button>
+
+                </form>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

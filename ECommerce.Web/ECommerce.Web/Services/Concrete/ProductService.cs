@@ -1,4 +1,5 @@
-﻿using ECommerce.Web.Infrastructure.Http;
+﻿using ECommerce.Web.Infrastructure.Authentication;
+using ECommerce.Web.Infrastructure.Http;
 using ECommerce.Web.Models;
 using ECommerce.Web.Services.Abstract;
 using ECommerce.Web.ViewModels.Product;
@@ -10,8 +11,10 @@ namespace ECommerce.Web.Services.Concrete;
 public sealed class ProductService
     : BaseApiService, IProductService
 {
-    public ProductService(HttpClient httpClient)
-        : base(httpClient)
+    public ProductService(
+    HttpClient httpClient,
+    ITokenService tokenService)
+    : base(httpClient, tokenService)
     {
     }
 
@@ -39,28 +42,39 @@ public sealed class ProductService
             query.Add($"sortBy={(int)request.SortBy}");
 
         var endpoint =
-            $"{ApiEndpoints.Products}?{string.Join("&", query)}";
+            $"{ApiEndpoints.Product.Base}?{string.Join("&", query)}";
 
         return await GetAsync<PagedResult<ProductListViewModel>>(
             endpoint,
             cancellationToken);
-
     }
-
-
-
-    public Task<ApiResponse<ProductDetailViewModel>?> GetByIdAsync(
-        int id,
-        CancellationToken cancellationToken = default)
+    public async Task<ApiResponse<ProductDetailViewModel>?> GetByIdAsync(
+    int productId,
+    CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return await GetAsync<ProductDetailViewModel>(
+            $"{ApiEndpoints.Product.Base}/{productId}",
+            cancellationToken);
     }
 
     public Task<ApiResponse<ProductDetailViewModel>?> CreateAsync(
         CreateProductViewModel request,
         CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return PostAsync<object, ProductDetailViewModel>(
+            ApiEndpoints.Product.Base,
+            new
+            {
+                request.Name,
+                Description = request.Description ?? string.Empty,
+                request.Price,
+                request.Stock,
+                request.CategoryId,
+                ImageUrl = "/theme/img/product-1.jpg",
+                ShortDescription = (string?)null,
+                IsFeatured = false
+            },
+            cancellationToken);
     }
 
     public Task<ApiResponse<ProductDetailViewModel>?> UpdateAsync(
@@ -68,14 +82,28 @@ public sealed class ProductService
         UpdateProductViewModel request,
         CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return PutAsync<object, ProductDetailViewModel>(
+            $"{ApiEndpoints.Product.Base}/{id}",
+            new
+            {
+                request.Name,
+                Description = request.Description ?? string.Empty,
+                request.Price,
+                request.CategoryId,
+                ImageUrl = "/theme/img/product-1.jpg",
+                ShortDescription = (string?)null,
+                IsFeatured = false
+            },
+            cancellationToken);
     }
 
     public Task<ApiResponse<object>?> DeleteAsync(
         int id,
         CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        return base.DeleteAsync(
+            $"{ApiEndpoints.Product.Base}/{id}",
+            cancellationToken);
     }
 
 
